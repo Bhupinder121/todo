@@ -1,6 +1,6 @@
 const sqlConnection = require('./connector.js')
 const express = require('express');
-const encryption = require('D:/Projects/encrypt/encrypt_decrypt.js')
+const encryption = require('./encrypt_decrypt.js')
 const bodyPraser = require('body-parser');
 const socketServer = require('socket.io');
 
