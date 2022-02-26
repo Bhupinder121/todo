@@ -30,10 +30,10 @@ function checkFinanceTales(){
         if(!tableListFinance.includes("exp_category")){
             let command = "CREATE TABLE `financeapp`.`exp_category` (\n\
                 `ID` INT NOT NULL AUTO_INCREMENT,\n\
-                `date` DATE NOT NULL,\n\
+                `date` DATE NULL,\n\
                 `ExpAmt` INT NULL,\n\
                 `ExpCate` VARCHAR(255) NULL,\n\
-                PRIMARY KEY (`date`))";
+                PRIMARY KEY (`ID`))";
             postData(command);
         }
     });
