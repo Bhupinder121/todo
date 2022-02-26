@@ -21,7 +21,7 @@ var pages_table = "pages_table";
 var quotes_table = "quotes_table";
 var advance_task = [];
 
-var server = app.listen(3000);
+var server = app.listen(421);
 
 let io = socketServer(server);
 
@@ -113,7 +113,6 @@ function add_book(bookName, bookPages) {
 
 
 function checkDateAndMonth() {
-    console.log("running");
     command = `SELECT taskAddDate FROM ${task_table} WHERE isPermanent = 1`;
     var D = new Date()
     var currentDate = D.getDate();
@@ -379,7 +378,6 @@ function getDatabaseDate(callback){
 }
 
 setTimeout(()=>{
-    console.log("run")
     setInterval(function () {
         checkDateAndMonth()
     }, 750);
