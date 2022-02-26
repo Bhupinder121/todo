@@ -113,6 +113,7 @@ function add_book(bookName, bookPages) {
 
 
 function checkDateAndMonth() {
+    console.log("running");
     command = `SELECT taskAddDate FROM ${task_table} WHERE isPermanent = 1`;
     var D = new Date()
     var currentDate = D.getDate();
@@ -377,9 +378,13 @@ function getDatabaseDate(callback){
     })
 }
 
-setInterval(function () {
-    checkDateAndMonth()
-}, 750);
+setTimeout(()=>{
+    console.log("run")
+    setInterval(function () {
+        checkDateAndMonth()
+    }, 750);
+}, 10000)
+
 
 function getNumOfDays() {
     var d = new Date();
