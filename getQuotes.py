@@ -1,30 +1,41 @@
 from bs4 import BeautifulSoup
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import mysql.connector
+import time
 
-html_text = requests.get('https://www.briantracy.com/blog/personal-success/26-motivational-quotes-for-success/').text
-soup = BeautifulSoup(html_text,'html.parser')
-rawQuotes = soup.find('div',class_ ='mainbar').find_all('h3')
 
+options = Options()
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36 OPR/71.0.3770.310"
+
+
+options.headless = True
+options.add_argument(f'user-agent={user_agent}')
+options.add_argument("--window-size=1920,1080")
+options.add_argument('--ignore-certificate-errors')
+options.add_argument('--allow-running-insecure-content')
+options.add_argument("--disable-extensions")
+options.add_argument("--proxy-server='direct://'")
+options.add_argument("--proxy-bypass-list=*")
+options.add_argument("--start-maximized")
+options.add_argument('--disable-gpu')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--no-sandbox')
+
+DRIVER_PATH = ""
+driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+driver.get('https://parade.com/937586/parade/life-quotes/')
+
+soup = BeautifulSoup(driver.page_source,'html.parser')
+rawData = soup.find_all('p')
 quotes = []
+for i in range(0, len(rawData)):
+    data = rawData[i].text
+    quoteData = data.split(".", 1)
+    if(quoteData[0].isdigit()):
+        quote = quoteData[1].replace("“", "").replace("”", "")
+        quotes.append(quote)
 
-for quote in rawQuotes:
-    if(quote.text!="Share Your Favorite Motivational Quotes in the Comments Below"):
-        num =""
-        count = 0
-        quote_text = quote.text.replace(")","")
-        for text in quote_text:
-            if(text.isdigit()):
-                count +=1 
-                if(count==3):
-                    break
-                num += text
-
-        quote_text = quote_text.replace(num,"")
-        quote_text = quote_text.replace(u'\u201c', '').replace(u'\u201d', '')
-        quote_text = quote_text.replace(" ",'',1)
-        quotes.append(quote_text)
-        
 
 # mydb = mysql.connector.connect(
 #   host="localhost",
@@ -38,4 +49,3 @@ for quote in rawQuotes:
 #     val = (quote, False)
 #     mycursor.execute(sql, val)
 #     mydb.commit()
-
