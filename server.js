@@ -49,7 +49,7 @@ app.get('/sendData', (req, res) => {
 });
 
 app.post('/getData', (req, res) => {
-    var encryptedString = req.body["nameValuePairs"]["json"];
+    var encryptedString = req.query["nameValuePairs"]["json"];
     let jsonData = JSON.parse(encryption.decrypt(encryptedString));
     if (jsonData.task != undefined) {
         addData(jsonData);
