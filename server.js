@@ -350,6 +350,15 @@ function getDBData(command, callback) {
         }
     });
 }
+function getMaxNum(numberOfDays, maxNum, bookPages){
+    if(numberOfDays*maxNum < bookPages){
+        maxNum += 10;
+        return getMaxNum(numberOfDays, maxNum, bookPages)
+    }
+    else{
+        return maxNum;
+    }
+}
 
 function postData(command) {
     sqlConnection.query(command, (err, rows, fields) => {
