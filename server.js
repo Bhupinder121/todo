@@ -21,7 +21,7 @@ var pages_table = "pages_table";
 var quotes_table = "quotes_table";
 var advance_task = [];
 
-var server = app.listen(421);
+var server = app.listen();
 
 let io = socketServer(server);
 
@@ -49,7 +49,7 @@ app.get('/sendData', (req, res) => {
 });
 
 app.post('/getData', (req, res) => {
-    var encryptedString = req.query["nameValuePairs"]["json"];
+    var encryptedString = req.body["nameValuePairs"]["json"];
     let jsonData = JSON.parse(encryption.decrypt(encryptedString));
     if (jsonData.task != undefined) {
         addData(jsonData);
