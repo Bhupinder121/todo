@@ -159,9 +159,9 @@ function ResetTask(advance_task, permanent_task) {
         console.log(permanent_task);
         for (let index = 0; index < permanent_task.length; index++) {
             var isPermanent = true;
-            if(index == permanent_task.length - 1){
-                isPermanent = false;
-            }
+//             if(index == permanent_task.length - 1){
+//                 isPermanent = false;
+//             }
             var date = new Date();
             var addDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             command = `INSERT INTO ${task_table} (TaskName,isDone,isNotDone,taskAddDate,taskDoneDate, isPermanent)
