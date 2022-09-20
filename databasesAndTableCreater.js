@@ -5,18 +5,18 @@ const sqlConnection = require('./connector.js')
 
 
 checkDatabase((state)=>{
-    if(state==""){
-        postData("CREATE SCHEMA remainderapp");
-        postData("CREATE SCHEMA financeapp");
-    }
-    else if(state=="remainderapp"){
-        postData("CREATE SCHEMA financeapp");
-    }
-    else if(state=="financeapp"){
-        postData("CREATE SCHEMA remainderapp");
-    }
+    // if(state==""){
+    //     postData("CREATE SCHEMA remainderdb");
+    //     postData("CREATE SCHEMA financeapp");
+    // }
+    // else if(state=="remainderdb"){
+    //     postData("CREATE SCHEMA financeapp");
+    // }
+    // else if(state=="financeapp"){
+    //     postData("CREATE SCHEMA remainderdb");
+    // }
     checkRemainderTables();
-    checkFinanceTales()
+    // checkFinanceTales()
 });
 
 function checkFinanceTales(){
@@ -40,11 +40,11 @@ function checkFinanceTales(){
 }
 
 function checkRemainderTables(){
-    changeDatabase("remainderapp");
+    // changeDatabase("remainderdb");
     getDBData("show tables ", (rows)=>{
         tableListRemainder = [];
         for (let index = 0; index < rows.length; index++) {
-            const element = rows[index]["Tables_in_remainderapp"];
+            const element = rows[index]["Tables_in_remainderdb"];
             tableListRemainder.push(element);
         }
         for(let i = 0; i < remainderTables.length; i++){
@@ -53,7 +53,7 @@ function checkRemainderTables(){
                 let command = ``;
                 switch (tableName){
                     case "task_table":
-                        command = "CREATE TABLE `remainderapp`.`task_table` (\n\
+                        command = "CREATE TABLE `remainderdb`.`task_table` (\n\
                             `taskID` INT NOT NULL AUTO_INCREMENT,\n\
                             `taskName` VARCHAR(255) NULL,\n\
                             `isDone` TINYINT NULL,\n\
@@ -64,7 +64,7 @@ function checkRemainderTables(){
                             PRIMARY KEY (`taskID`))"
                         break;
                     case "notdonetask_table":
-                        command = "CREATE TABLE `remainderapp`.`notdonetask_table` (\n\
+                        command = "CREATE TABLE `remainderdb`.`notdonetask_table` (\n\
                             `taskID` INT NOT NULL AUTO_INCREMENT,\n\
                             `taskName` VARCHAR(255) NULL,\n\
                             `isDone` TINYINT NULL,\n\
@@ -75,14 +75,14 @@ function checkRemainderTables(){
                             PRIMARY KEY (`taskID`))"
                         break;
                     case "quotes_table":
-                        command = "CREATE TABLE `remainderapp`.`quotes_table` (\n\
+                        command = "CREATE TABLE `remainderdb`.`quotes_table` (\n\
                             `quoteID` INT NOT NULL AUTO_INCREMENT,\n\
                             `quoteName` VARCHAR(500) NULL,\n\
                             `isSend` TINYINT NULL,\n\
                             PRIMARY KEY (`quoteID`))";
                         break;
                     case "books_table":
-                        command = "CREATE TABLE `remainderapp`.`books_table` (\n\
+                        command = "CREATE TABLE `remainderdb`.`books_table` (\n\
                             `bookID` INT NOT NULL AUTO_INCREMENT,\n\
                             `bookName` VARCHAR(255) NULL,\n\
                             `bookPages` INT NULL,\n\
@@ -90,7 +90,7 @@ function checkRemainderTables(){
                             PRIMARY KEY (`bookID`))";
                         break;
                     case "pages_table":
-                        command = "CREATE TABLE `remainderapp`.`pages_table` (\n\
+                        command = "CREATE TABLE `remainderdb`.`pages_table` (\n\
                             `pageID` INT NULL,\n\
                             `pagesForDay` VARCHAR(300) NULL,\n\
                             `isDone` INT NULL,\n\
@@ -118,9 +118,9 @@ function checkDatabase(callback){
         let count = "";
         for(let i = 0; i<rows.length; i++){
             let databaseName = rows[i]["Database"];
-            if(databaseName == "remainderapp"){
+            if(databaseName == "remainderdb"){
                 if(count == ""){
-                    count = "remainderapp";
+                    count = "remainderdb";
                 }
                 else{
                     count = "dual";

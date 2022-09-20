@@ -7,10 +7,9 @@ const socketServer = require('socket.io');
 
 var app = express();
 app.use(bodyPraser.json());
-app.use(express.json())
-app.use(express.static('templates'));
+// app.use(express.json())
+// app.use(express.static('templates'));
 var command = ``;
-var toogle = true;
 
 var task_table = "task_table";
 var dateTableName = "date_month";
@@ -323,27 +322,27 @@ function getPermanent(data){
     postData(command);
 }
 
-io.sockets.on("connection", (socket) => {
-    socket.on("req", giveData);
-    socket.on("done", getdone);
-    socket.on("add", addData)
-    socket.on("clear", Clear)
-    socket.on("master", giveMaster)
+// io.sockets.on("connection", (socket) => {
+//     socket.on("req", giveData);
+//     socket.on("done", getdone);
+//     socket.on("add", addData)
+//     socket.on("clear", Clear)
+//     socket.on("master", giveMaster)
 
-    function giveData() {
-        command = `SELECT * FROM ${task_table}`;
-        getDBData(command, function (res) {
-            socket.emit("data", res);
-        })
-    }
+//     function giveData() {
+//         command = `SELECT * FROM ${task_table}`;
+//         getDBData(command, function (res) {
+//             socket.emit("data", res);
+//         })
+//     }
 
-    function giveMaster() {
-        command = `SELECT * FROM ${masterTable} WHERE isMaster = true`;
-        getDBData(command, function (res) {
-            socket.emit("Master", res);
-        });
-    }
-});
+//     function giveMaster() {
+//         command = `SELECT * FROM ${masterTable} WHERE isMaster = true`;
+//         getDBData(command, function (res) {
+//             socket.emit("Master", res);
+//         });
+//     }
+// });
 
 function getDBData(command, callback) {
     sqlConnection.query(command, (err, rows, fields) => {
