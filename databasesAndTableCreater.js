@@ -92,7 +92,7 @@ function checkRemainderTables(){
                     case "pages_table":
                         command = "CREATE TABLE `remainderapp`.`pages_table` (\n\
                             `pageID` INT NULL,\n\
-                            `pagesForDay` INT NULL,\n\
+                            `pagesForDay` VARCHAR(300) NULL,\n\
                             `isDone` INT NULL,\n\
                             `isSend` INT NULL,\n\
                             `isNotDone` INT NULL)"
