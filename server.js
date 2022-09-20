@@ -21,9 +21,14 @@ var pages_table = "pages_table";
 var quotes_table = "quotes_table";
 var advance_task = [];
 
-var server = app.listen(421);
+var server = app.listen(3000);
 
 let io = socketServer(server);
+
+app.get("/", (req, res)=>{
+    console.log("new Connection");
+    res.status(200).send("Server is running!!!!");
+});
 
 app.get('/sendData', (req, res) => {
     let reqData = req.query.data_query;
@@ -49,7 +54,8 @@ app.get('/sendData', (req, res) => {
 });
 
 app.post('/getData', (req, res) => {
-    var encryptedString = req.query["nameValuePairs"]["json"];
+
+    var encryptedString = req.body["nameValuePairs"]["json"];
     let jsonData = JSON.parse(encryption.decrypt(encryptedString));
     if (jsonData.task != undefined) {
         addData(jsonData);
@@ -60,7 +66,7 @@ app.post('/getData', (req, res) => {
     else if (jsonData.clear != undefined) {
         Clear();
     }
-    else if (jsonData.book != undefined) {
+    else if (jsonData.book != undefined) { 
         add_book(jsonData.book, jsonData.pages);
     }
     else if (jsonData.quote != undefined) {

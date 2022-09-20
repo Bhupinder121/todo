@@ -1,10 +1,10 @@
 const mysql = require('mysql');
 
 var mysqlConnection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Bhupinder@1234",
-    database: "test",
+    host: "remainderdatabase.cmvat6qvy1bw.ap-south-1.rds.amazonaws.com",
+    user: "admin",
+    password: "awsMaster",
+    database: "remainderdb",
     multipleStatements: true
 });
 
