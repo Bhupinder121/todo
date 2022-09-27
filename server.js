@@ -4,7 +4,7 @@ const encryption = require('./encrypt_decrypt.js')
 const bodyPraser = require('body-parser');
 const socketServer = require('socket.io');
 
-
+let databaseDate, databaseMonth;
 var app = express();
 app.use(bodyPraser.json());
 // app.use(express.json())
@@ -12,13 +12,13 @@ app.use(bodyPraser.json());
 var command = ``;
 
 var task_table = "task_table";
-var dateTableName = "date_month";
+var utilties_table = "utilites_table";
 var masterTable = "master_table";
 var books_table = "books_table";
 var notdonetask_table = "notdonetask_table";
 var pages_table = "pages_table";
 var quotes_table = "quotes_table";
-var advance_task = [];
+
 
 var server = app.listen(3000);
 
@@ -74,7 +74,7 @@ app.post('/getData', (req, res) => {
     else if (jsonData.isPermanent != undefined){
         getPermanent(jsonData);
     }
-    
+    res.send("Done").status(200);
 });
 
 
@@ -117,25 +117,26 @@ function add_book(bookName, bookPages) {
 
 
 function checkDateAndMonth() {
-    command = `SELECT taskAddDate FROM ${task_table} WHERE isPermanent = 1`;
+    
     var D = new Date()
     var currentDate = D.getDate();
     var currentMonth = D.getMonth();
-    var currentYear = D.getFullYear()
-    getDBData(command, (res) => {
-        if (res.length > 0) {
-            var databaseMonth = res[0]["taskAddDate"].getMonth();
-            var databaseDate = res[0]["taskAddDate"].getDate();
-            if (databaseMonth != currentMonth) {
-                monthChanged();
-                console.log("month changed")
-            }
-            else if (databaseDate != currentDate) {
-                console.log("date changed")
-                dateChanged();
-            }
-        }
-    });
+    
+    if (databaseMonth != currentMonth) {
+        postData(`update ${utilties_table} set month = ${currentMonth}, date = ${currentDate}`)
+        databaseMonth = currentMonth;
+        databaseDate = currentDate;
+        monthChanged();
+        
+        console.log("month changed")
+    }
+    else if (databaseDate != currentDate) {
+        console.log("date changed");
+        postData(`update ${utilties_table} set date = ${currentDate}`)
+        databaseDate = currentDate;
+        dateChanged();
+    }
+    
 }
 
 function deleteRows(Name) {
@@ -163,9 +164,9 @@ function ResetTask(advance_task, permanent_task) {
         console.log(permanent_task);
         for (let index = 0; index < permanent_task.length; index++) {
             var isPermanent = true;
-//             if(index == permanent_task.length - 1){
-//                 isPermanent = false;
-//             }
+            if(index == permanent_task.length - 1){
+                isPermanent = false;
+            }
             var date = new Date();
             var addDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             command = `INSERT INTO ${task_table} (TaskName,isDone,isNotDone,taskAddDate,taskDoneDate, isPermanent)
@@ -240,14 +241,21 @@ function addData(Data) {
 
 function getdone(data) {
     var table = task_table;
-    getDatabaseDate((doneDate)=>{
-        if(parseInt(data.isNotDone) == 1){
-            table = notdonetask_table;
-        }
-        command = `UPDATE ${table} SET isDone=true, taskDoneDate = '${doneDate}' WHERE taskID=${data.isDone}`
-        postData(command);
-        console.log("DONE");
-    });
+    // getDatabaseDate((doneDate)=>{
+    //     if(parseInt(data.isNotDone) == 1){
+    //         table = notdonetask_table;
+    //     }
+    //     command = `UPDATE ${table} SET isDone=true, taskDoneDate = '${doneDate}' WHERE taskID=${data.isDone}`
+    //     postData(command);
+    //     console.log("DONE");
+    // });
+    let doneDate = getDatabaseDate();
+    if(parseInt(data.isNotDone) == 1){
+        table = notdonetask_table;
+    }
+    command = `UPDATE ${table} SET isDone=true, taskDoneDate = '${doneDate}' WHERE taskID=${data.isDone}`
+    postData(command);
+    console.log("DONE");
 }
 
 function monthChanged() {
@@ -297,10 +305,10 @@ function dateChanged(currentYear = new Date().getFullYear(), currentMonth = new 
                 WHERE isNotDone = 1;`;
     postData(command);
 
-    command = `SELECT * FROM ${task_table} WHERE (isNotDone = false AND isDone = false) OR isPermanent = true`;
+    command = `SELECT * FROM ${task_table} WHERE (isNotDone = false AND isDone = false) OR isPermanent = true`; // get permanent
     getDBData(command, function (res) {
         var advance_task = [];
-        var permanent_task = [];
+        var permanent_tasks = [];
         for (let index = 0; index < res.length; index++) {
             const element = res[index];
             var addDate = `${element["taskAddDate"].getFullYear()}-${element["taskAddDate"].getMonth() + 1}-${element["taskAddDate"].getDate()}`;
@@ -310,10 +318,11 @@ function dateChanged(currentYear = new Date().getFullYear(), currentMonth = new 
                 advance_task.push(addDate);
             }
             else{
-                permanent_task.push(taskName);
+                permanent_tasks.push(taskName);
             }
         }
-        ResetTask(advance_task, permanent_task);
+        permanent_task = permanent_tasks[0];
+        ResetTask(advance_task, permanent_tasks);
     });
 }
 
@@ -375,26 +384,28 @@ function postData(command) {
     });
 }
 
-function getDatabaseDate(callback){
-    command = `SELECT taskAddDate FROM ${task_table} WHERE isPermanent = 1`;
-    getDBData(command, (res)=>{
-        var date = new Date();
-        if(res.length > 0){
-            date = res[0]["taskAddDate"];
-        }
-        var databaseMonth = date.getMonth();
-        var databaseDate = date.getDate();
-        var databaseYear = date.getFullYear();
-        var currentDate = `${databaseYear}-${databaseMonth + 1}-${databaseDate}`;
-        return callback(currentDate);
-    })
+function getDatabaseDate(){
+    let date = new Date();
+    let databaseYear = date.getFullYear();
+    let currentDate = `${databaseYear}-${databaseMonth + 1}-${databaseDate}`;
+    return currentDate;
 }
 
 setTimeout(()=>{
-    setInterval(function () {
-        checkDateAndMonth()
-    }, 750);
-}, 10000)
+    command = `SELECT date, month FROM ${utilties_table}`;
+    getDBData(command, (res) => {
+        if (res.length > 0) {
+            databaseDate = parseInt(res[0]["date"]);
+            databaseMonth = parseInt(res[0]["month"]);
+            setInterval(function () {
+                
+                checkDateAndMonth();
+        
+            }, 750);
+        }
+    });
+    
+}, 1000)
 
 
 function getNumOfDays() {
